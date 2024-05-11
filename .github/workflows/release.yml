@@ -74,4 +74,4 @@ jobs:
               python -m build
               python -m twine upload -r testpypi dist/* --skip-existing -u __token__ -p "$TEST_PYPI_TOKEN" 
             
-            continue-on-error: false  # Ensure that errors in this step fail the workflow
+            continue-on-error: false  # Ensure that errors in this step fail the workflow (retry)
