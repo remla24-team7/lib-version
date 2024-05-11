@@ -56,6 +56,12 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+
+          - name: Print Current Directory and print contents
+            run: |
+              pwd
+              ls -a  
+
           - name: Build and publish to TestPyPI
             env:
               TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
