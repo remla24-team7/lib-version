@@ -1,0 +1,61 @@
+name: Release
+on:
+    push:
+        tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+jobs:
+    build:
+      name: Build distribution
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v3
+
+        - name: Parse version infro from tag
+          run:  |
+            # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
+            VERSION=${GITHUB_REF:11}
+            MAJOR=`echo "$VERSION" | cut -d . -f 1`
+            MINOR=`echo "$VERSION" | cut -d . -f 2`
+            PATCH=`echo "$VERSION" | cut -d . -f 3`
+            echo "version=$VERSION" >> $GITHUB_ENV
+            echo "version_major=$MAJOR" >> $GITHUB_ENV
+            echo "version_minor=$MINOR" >> $GITHUB_ENV
+            echo "version_patch=$PATCH" >> $GITHUB_ENV
+
+        - uses: actions/checkout@v4
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.x"
+        - name: Install pypa/build
+          run: >-
+            python3 -m
+            pip install
+            build
+            --user
+        - name: Build a binary wheel and a source tarball
+          run: python3 -m build
+        - name: Store the distribution packages
+          uses: actions/upload-artifact@v3
+          with:
+            name: python-package-distributions
+            path: dist/
+    publish-to-pypi:
+        name: >-
+            Publish Python 🐍 distribution 📦 to TestPyPI
+        if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
+        needs:
+        - build
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Build and publish to TestPyPI
+            run: |
+              pip install build twine
+              python -m build
+              python -m twine upload -r testpypi dist/* --skip-existing
+            env:
+              TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+              TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+            continue-on-error: false  # Ensure that errors in this step fail the workflow
