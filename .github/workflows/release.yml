@@ -13,7 +13,11 @@ jobs:
         - name: Checkout Repository
           uses: actions/checkout@v3
 
-        - name: Parse version infro from tag
+        - name: Print Current Directory
+          run: |
+            pwd
+
+        - name: Parse version info from tag
           run:  |
             # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
             VERSION=${GITHUB_REF:11}
