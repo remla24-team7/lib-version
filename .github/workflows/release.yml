@@ -16,6 +16,7 @@ jobs:
         - name: Print Current Directory
           run: |
             pwd
+            ls -a
 
         - name: Parse version info from tag
           run:  |
