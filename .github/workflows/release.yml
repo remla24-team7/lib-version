@@ -58,6 +58,8 @@ jobs:
         steps:
 
           - name: Print Current Directory and print contents
+            uses: actions/checkout@v4
+            
             run: |
               pwd
               ls -a  
