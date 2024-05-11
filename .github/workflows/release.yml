@@ -68,10 +68,10 @@ jobs:
             env:
               TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
               TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-              PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+              TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
             run: |
               pip install build twine
               python -m build
               python -m twine upload -r testpypi dist/* --skip-existing -u __token__ -p "$TEST_PYPI_TOKEN" --verbose
             
-            continue-on-error: false  # Ensure that errors in this step fail the workflow (retry)
+            continue-on-error: false  # Ensure that errors in this step fail the workflow
