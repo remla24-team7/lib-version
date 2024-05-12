@@ -19,7 +19,7 @@ with open(version_file, 'r') as file:
     exec(file.read(), version)
 
 setup(
-    name="remla24_team7_libversion",
+    name="remla24-team7-libversion",
     version=version['__version__'],
     url='https://github.com/remla24-team7/lib-version',
     author='Kevin Tran',
