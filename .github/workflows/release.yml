@@ -10,11 +10,12 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-        - name: Print Current Branch
-          run: echo $GITHUB_REF
-          with:
-            ref: tags # Checking out the latest tag
-            
+        - name: GitHub Tag Name example
+          run: |
+            echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
+            echo "Tag name from github.ref_name: ${{  github.ref_name }}"
+          
+
         - name: Checkout Repository
           uses: actions/checkout@v3
 

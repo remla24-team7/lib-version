@@ -12,6 +12,7 @@ with open("README.md", "r") as f:
 """
 Code used from: https://gist.github.com/pwithnall/7bc5f320b3bdf418265a
 """
+__all__ = ('get_version')
 
 version_re = re.compile('^Version: (.+)$', re.M)
 
