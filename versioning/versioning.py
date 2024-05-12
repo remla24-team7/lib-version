@@ -1,5 +1,6 @@
 import importlib.util
 import os
+from .version import __version__
 
 class VersionUtil:
   def __init__(self):
@@ -15,6 +16,9 @@ class VersionUtil:
     # Use importlib to import the version information
     spec = importlib.util.spec_from_file_location("setup", setup_file)
     module = importlib.util.module_from_spec(spec)
-    importlib.util.execute(module)
+    # importlib.util.execute(module)
 
-    return module.__version__
+    # spec.loader.exec_module(module)
+    # importlib.util.execute(module)
+    # Ignore the module for now
+    return __version__
