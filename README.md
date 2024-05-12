@@ -6,7 +6,7 @@ A version-aware library that can can be asked for the version of the library.
 To install package: 
 `pip install remla24-team7-libversion`
 
-### Python example
+## Python example
 
     import versioning
 
