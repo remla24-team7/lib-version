@@ -10,6 +10,9 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
+        
+        - name: Checkout Repository
+          uses: actions/checkout@v3
 
         - name: Install requirements.txt
           run: |
@@ -18,9 +21,6 @@ jobs:
         - name: Auto bump version
           run: |
             bump2version patch --config-file .bumpversion.cfg
-        
-        - name: Checkout Repository
-          uses: actions/checkout@v3
 
         - name: Print Current Directory
           run: |
