@@ -1,0 +1,121 @@
+name: Release
+on:
+    push:
+        branches:
+            - automatic-versioning
+        # tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+jobs:
+    build:
+      name: Build distribution
+      runs-on: ubuntu-latest
+
+      steps:
+        
+        - name: Checkout Repository
+          uses: actions/checkout@v3
+
+        - name: Install requirements.txt
+          run: |
+            python -m pip install --upgrade pip
+            pip install -r requirements.txt
+
+        - name: Set Git Identity
+          run: |
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+        - name: Auto bump version
+          run: |
+            bump2version patch --config-file .bumpversion.cfg
+
+        - name: Print Current Directory
+          run: |
+            pwd
+            ls -a
+
+        - name: Parse version info from tag
+          run:  |
+            # GITHUB_REF is like refs/tags/v2.3.5, so strip the first 11 chars
+            VERSION=${GITHUB_REF:11}
+            MAJOR=`echo "$VERSION" | cut -d . -f 1`
+            MINOR=`echo "$VERSION" | cut -d . -f 2`
+            PATCH=`echo "$VERSION" | cut -d . -f 3`
+            echo "version=$VERSION" >> $GITHUB_ENV
+            echo "version_major=$MAJOR" >> $GITHUB_ENV
+            echo "version_minor=$MINOR" >> $GITHUB_ENV
+            echo "version_patch=$PATCH" >> $GITHUB_ENV
+
+        - uses: actions/checkout@v4
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: "3.x"
+        - name: Install pypa/build
+          run: >-
+            python3 -m
+            pip install
+            build
+            --user
+        - name: Build a binary wheel and a source tarball
+          run: python3 -m build
+        - name: Store the distribution packages
+          uses: actions/upload-artifact@v3
+          with:
+            name: python-package-distributions
+            path: dist/
+    
+    publish-to-pypi:
+        name: >-
+            PyPi Publish Python 🐍 distribution 📦 
+        needs:
+        - build
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Repository
+              uses: actions/checkout@v3
+
+            - name: Print Current Directory and print contents
+              run: |
+                pwd
+                ls -a  
+
+            - name: Build and publish to PyPI
+              env:
+                TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+                TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+                TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+                PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+              run: |
+                pip install build twine
+                python -m build
+                python -m twine upload dist/* --skip-existing -u __token__ -p "$PYPI_TOKEN" --verbose
+            
+              continue-on-error: false  # Ensure that errors in this step fail the workflow
+
+    publish-to-testpypi:
+        name: >-
+            TestPyPi Publish Python 🐍 distribution 📦
+        needs:
+        - build
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout Repository
+            uses: actions/checkout@v3
+
+          - name: Print Current Directory and print contents
+            run: |
+              pwd
+              ls -a  
+
+          - name: Build and publish to TestPyPI
+            env:
+              TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+              TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+              TEST_PYPI_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+            run: |
+              pip install build twine
+              python -m build
+              python -m twine upload -r testpypi dist/* --skip-existing -u __token__ -p "$TEST_PYPI_TOKEN" --verbose
+            
+            continue-on-error: false  # Ensure that errors in this step fail the workflow
